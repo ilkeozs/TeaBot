@@ -91,6 +91,47 @@ namespace TeaBot.Commands.Moderation_Commands
             }
         }
 
+        [Command("kick")]
+        public async Task KickCommand(CommandContext ctx, DiscordMember member, string reason = null)
+        {
+            if (ctx.Member.Permissions.HasPermission(Permissions.KickMembers))
+            {
+                try
+                {
+                    await member.RemoveAsync(reason);
+
+                    var message = new DiscordEmbedBuilder()
+                    {
+                        Title = "Member Kicked",
+                        Description = $"{member.Username} successfully kicked from the server by {ctx.User.Username}\nReason: {reason}",
+                        Color = DiscordColor.Green
+                    };
+                    await ctx.Channel.SendMessageAsync(embed: message);
+                }
+                catch (Exception)
+                {
+                    var message = new DiscordEmbedBuilder()
+                    {
+                        Title = "Error",
+                        Description = "**Possible Reasons**\n\n``The user to be kicked from the server must have a lower permission than the bot.``",
+                        Color = DiscordColor.Red
+                    };
+                    await ctx.Channel.SendMessageAsync(embed: message);
+                }
+            }
+
+            else
+            {
+                var message = new DiscordEmbedBuilder()
+                {
+                    Title = "Permission Error",
+                    Description = "To use this command, you must have permission to kick members!",
+                    Color = DiscordColor.Red
+                };
+                await ctx.Channel.SendMessageAsync(embed: message);
+            }
+        }
+
         [Command("del")]
         public async Task DeleteCommand(CommandContext ctx)
         {
